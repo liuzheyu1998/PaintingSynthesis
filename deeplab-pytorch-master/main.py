@@ -26,6 +26,9 @@ from tqdm import tqdm
 from libs.datasets import get_dataset
 from libs.models import DeepLabV2_ResNet101_MSC
 from libs.utils import DenseCRF, PolynomialLR, scores
+import wandb
+
+wandb.init(project="painting-synthesis", entity="qx2217")
 
 
 def makedirs(dirs):
@@ -251,6 +254,10 @@ def train(config_path, cuda):
 
         # TensorBoard
         if iteration % CONFIG.SOLVER.ITER_TB == 0:
+            wandb.log({
+                "epoch": iteration,
+                "train loss": average_loss.value()[0]
+            })
             writer.add_scalar("loss/train", average_loss.value()[0], iteration)
             for i, o in enumerate(optimizer.param_groups):
                 writer.add_scalar("lr/group_{}".format(i), o["lr"], iteration)
