@@ -27,6 +27,7 @@ from libs.datasets import get_dataset
 from libs.models import DeepLabV2_ResNet101_MSC
 from libs.utils import DenseCRF, PolynomialLR, scores
 import wandb
+from datetime import datetime
 
 wandb.init(project="painting-synthesis", entity="qx2217")
 
@@ -196,11 +197,14 @@ def train(config_path, cuda):
     average_loss = MovingAverageValueMeter(CONFIG.SOLVER.AVERAGE_LOSS)
 
     # Path to save models
+    time_info = datetime.now()
+    timestamp = f"{time_info.month}-{time_info.day}-{time_info.hour}-{time_info.minute}"
     checkpoint_dir = os.path.join(
         CONFIG.EXP.OUTPUT_DIR,
         "models",
         CONFIG.EXP.ID,
         CONFIG.MODEL.NAME.lower(),
+        timestamp,
         CONFIG.DATASET.SPLIT.TRAIN,
     )
     makedirs(checkpoint_dir)

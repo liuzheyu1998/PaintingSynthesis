@@ -4,7 +4,7 @@ EXP:
 
 DATASET:
     NAME: cocostuff164k
-    ROOT: /home/qx2217/data/
+    ROOT: /home/qx2217/data/coco_style/
     LABELS: /home/qx2217/data/datasets/cocostuff/labels.txt
     N_CLASSES: 182
     IGNORE_LABEL: 255
@@ -37,9 +37,9 @@ SOLVER:
     BATCH_SIZE:
         TRAIN: 5
         TEST: 1
-    ITER_MAX: 100000
+    ITER_MAX: 1000
     ITER_SIZE: 2
-    ITER_SAVE: 1
+    ITER_SAVE: 50
     ITER_TB: 1
     LR_DECAY: 10
     LR: 2.5e-4
