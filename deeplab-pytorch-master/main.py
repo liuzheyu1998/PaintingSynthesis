@@ -29,7 +29,14 @@ from libs.utils import DenseCRF, PolynomialLR, scores
 import wandb
 from datetime import datetime
 
-wandb.init(project="painting-synthesis", entity="qx2217")
+wandb.init(project="painting-synthesis",
+           entity="qx2217",
+           config={
+               "Pixel Accuracy": -1,
+               "Mean Accuracy": -1,
+               "Frequency Weighted IoU": -1,
+               "Mean IoU": -1
+           })
 
 
 def makedirs(dirs):
@@ -400,6 +407,12 @@ def test(config_path, model_path, cuda):
 
     # Pixel Accuracy, Mean Accuracy, Class IoU, Mean IoU, Freq Weighted IoU
     score = scores(gts, preds, n_class=CONFIG.DATASET.N_CLASSES)
+    wandb.config.update({
+               "Pixel Accuracy": score["Pixel Accuracy"],
+               "Mean Accuracy": score["Mean Accuracy"],
+               "Frequency Weighted IoU": score["Frequency Weighted IoU"],
+               "Mean IoU": score["Mean IoU"]
+           }, allow_val_change=True)
 
     with open(save_path, "w") as f:
         json.dump(score, f, indent=4, sort_keys=True)
