@@ -156,6 +156,9 @@ def train(config_path, cuda):
     # Model setup
     model = DeepLabV2_ResNet101_MSC(n_classes=CONFIG.DATASET.N_CLASSES)
     state_dict = torch.load(CONFIG.MODEL.INIT_MODEL)
+    print("****** state_dict *******")
+    print(state_dict)
+    print("****** end of state_dict *******")
     print("    Init:", CONFIG.MODEL.INIT_MODEL)
     for m in model.base.state_dict().keys():
         if m not in state_dict.keys():
@@ -348,8 +351,7 @@ def test(config_path, model_path, cuda):
 
     # Model
     model = eval(CONFIG.MODEL.NAME)(n_classes=CONFIG.DATASET.N_CLASSES)
-    # state_dict = torch.load(model_path, map_location=lambda storage, loc: storage)
-    state_dict = torch.load(model_path)  # TODO
+    state_dict = torch.load(model_path, map_location=lambda storage, loc: storage)
     model.load_state_dict(state_dict)
     model = nn.DataParallel(model)
     model.eval()
