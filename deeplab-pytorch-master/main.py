@@ -29,15 +29,6 @@ from libs.utils import DenseCRF, PolynomialLR, scores
 import wandb
 from datetime import datetime
 
-wandb.init(project="painting-synthesis",
-           entity="qx2217",
-           config={
-               "Pixel Accuracy": -1,
-               "Mean Accuracy": -1,
-               "Frequency Weighted IoU": -1,
-               "Mean IoU": -1
-           })
-
 
 def makedirs(dirs):
     if not os.path.exists(dirs):
@@ -447,6 +438,17 @@ def crf(config_path, n_jobs):
     CONFIG = OmegaConf.load(config_path)
     torch.set_grad_enabled(False)
     print("# jobs:", n_jobs)
+
+    # wandb
+    wandb.init(project="painting-synthesis",
+               entity="qx2217",
+               name=CONFIG.EXP.ID,
+               config={
+                   "Pixel Accuracy": -1,
+                   "Mean Accuracy": -1,
+                   "Frequency Weighted IoU": -1,
+                   "Mean IoU": -1
+               })
 
     # Dataset
     dataset = get_dataset(CONFIG.DATASET.NAME)(
