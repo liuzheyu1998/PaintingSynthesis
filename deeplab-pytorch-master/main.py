@@ -164,6 +164,23 @@ def train(config_path, cuda):
     model = nn.DataParallel(model)
     model.to(device)
 
+    # TODO
+    time_info = datetime.now()
+    timestamp = f"{time_info.month}-{time_info.day}-{time_info.hour}-{time_info.minute}"
+    checkpoint_dir = os.path.join(
+        CONFIG.EXP.OUTPUT_DIR,
+        "models",
+        CONFIG.EXP.ID,
+        CONFIG.MODEL.NAME.lower(),
+        timestamp,
+        CONFIG.DATASET.SPLIT.TRAIN,
+    )
+    torch.save(
+        model.module.state_dict(), os.path.join(checkpoint_dir, "checkpoint_final.pth")
+    )
+
+    assert False
+
     # Loss definition
     criterion = nn.CrossEntropyLoss(ignore_index=CONFIG.DATASET.IGNORE_LABEL)
     criterion.to(device)
@@ -227,7 +244,6 @@ def train(config_path, cuda):
         total=CONFIG.SOLVER.ITER_MAX,
         dynamic_ncols=True,
     ):
-        break  # TODO
         # Clear gradients (ready to accumulate)
         optimizer.zero_grad()
 
