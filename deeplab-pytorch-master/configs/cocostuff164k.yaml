@@ -31,7 +31,7 @@ MODEL:
     NAME: DeepLabV2_ResNet101_MSC
     N_BLOCKS: [3, 4, 23, 3]
     ATROUS_RATES: [6, 12, 18, 24]
-    INIT_MODEL: /home/qx2217/PaintingSynthesis/deeplab-pytorch-master/models/deeplabv2_resnet101_msc-cocostuff164k-10000.pth
+    INIT_MODEL: /home/qx2217/PaintingSynthesis/deeplab-pytorch-master/models/deeplabv2_resnet101_msc-cocostuff164k-100000.pth
 
 SOLVER:
     BATCH_SIZE:
