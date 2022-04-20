@@ -164,23 +164,6 @@ def train(config_path, cuda):
     model = nn.DataParallel(model)
     model.to(device)
 
-    # TODO
-    time_info = datetime.now()
-    timestamp = f"{time_info.month}-{time_info.day}-{time_info.hour}-{time_info.minute}"
-    checkpoint_dir = os.path.join(
-        CONFIG.EXP.OUTPUT_DIR,
-        "models",
-        CONFIG.EXP.ID,
-        CONFIG.MODEL.NAME.lower(),
-        timestamp,
-        CONFIG.DATASET.SPLIT.TRAIN,
-    )
-    torch.save(
-        model.module.state_dict(), os.path.join(checkpoint_dir, "checkpoint_final.pth")
-    )
-
-    assert False
-
     # Loss definition
     criterion = nn.CrossEntropyLoss(ignore_index=CONFIG.DATASET.IGNORE_LABEL)
     criterion.to(device)
@@ -235,8 +218,7 @@ def train(config_path, cuda):
     print("Checkpoint dst:", checkpoint_dir)
 
     # Freeze the batch norm pre-trained on COCO
-    # model.train()
-    model.eval()  # TODO
+    model.train()
     model.module.base.freeze_bn()
 
     for iteration in tqdm(
@@ -366,7 +348,8 @@ def test(config_path, model_path, cuda):
 
     # Model
     model = eval(CONFIG.MODEL.NAME)(n_classes=CONFIG.DATASET.N_CLASSES)
-    state_dict = torch.load(model_path, map_location=lambda storage, loc: storage)
+    # state_dict = torch.load(model_path, map_location=lambda storage, loc: storage)
+    state_dict = torch.load(model_path)  # TODO
     model.load_state_dict(state_dict)
     model = nn.DataParallel(model)
     model.eval()
