@@ -156,14 +156,16 @@ def train(config_path, cuda):
     # Model setup
     model = DeepLabV2_ResNet101_MSC(n_classes=CONFIG.DATASET.N_CLASSES)
     state_dict = torch.load(CONFIG.MODEL.INIT_MODEL)
-    print("****** state_dict *******")
-    print(state_dict)
-    print("****** end of state_dict *******")
     print("    Init:", CONFIG.MODEL.INIT_MODEL)
-    for m in model.base.state_dict().keys():
+    # for m in model.base.state_dict().keys():
+    #     if m not in state_dict.keys():
+    #         print("    Skip init:", m)
+    # TODO
+    for m in model.state_dict().keys():
         if m not in state_dict.keys():
-            print("    Skip init:", m)
-    model.base.load_state_dict(state_dict, strict=False)  # to skip ASPP
+            print("    model Skip init:", m)
+    # model.base.load_state_dict(state_dict, strict=False)  # to skip ASPP
+    model.load_state_dict(state_dict)  # TODO
     model = nn.DataParallel(model)
     model.to(device)
 
