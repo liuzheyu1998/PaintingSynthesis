@@ -218,7 +218,8 @@ def train(config_path, cuda):
     print("Checkpoint dst:", checkpoint_dir)
 
     # Freeze the batch norm pre-trained on COCO
-    model.train()
+    # model.train()
+    model.eval()  # TODO
     model.module.base.freeze_bn()
 
     for iteration in tqdm(
@@ -226,7 +227,7 @@ def train(config_path, cuda):
         total=CONFIG.SOLVER.ITER_MAX,
         dynamic_ncols=True,
     ):
-
+        break  # TODO
         # Clear gradients (ready to accumulate)
         optimizer.zero_grad()
 
