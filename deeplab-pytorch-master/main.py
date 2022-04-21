@@ -115,6 +115,17 @@ def train(config_path, cuda):
     device = get_device(cuda)
     torch.backends.cudnn.benchmark = True
 
+    # wandb
+    wandb.init(project="painting-synthesis",
+               entity="qx2217",
+               name=CONFIG.EXP.ID + '_train',
+               config={
+                   "Pixel Accuracy": -1,
+                   "Mean Accuracy": -1,
+                   "Frequency Weighted IoU": -1,
+                   "Mean IoU": -1
+               })
+
     # Dataset
     dataset = get_dataset(CONFIG.DATASET.NAME)(
         root=CONFIG.DATASET.ROOT,
@@ -324,6 +335,17 @@ def test(config_path, model_path, cuda):
     device = get_device(cuda)
     torch.set_grad_enabled(False)
 
+    # wandb
+    wandb.init(project="painting-synthesis",
+               entity="qx2217",
+               name=CONFIG.EXP.ID + '_test',
+               config={
+                   "Pixel Accuracy": -1,
+                   "Mean Accuracy": -1,
+                   "Frequency Weighted IoU": -1,
+                   "Mean IoU": -1
+               })
+
     # Dataset
     dataset = get_dataset(CONFIG.DATASET.NAME)(
         root=CONFIG.DATASET.ROOT,
@@ -438,17 +460,6 @@ def crf(config_path, n_jobs):
     CONFIG = OmegaConf.load(config_path)
     torch.set_grad_enabled(False)
     print("# jobs:", n_jobs)
-
-    # wandb
-    wandb.init(project="painting-synthesis",
-               entity="qx2217",
-               name=CONFIG.EXP.ID,
-               config={
-                   "Pixel Accuracy": -1,
-                   "Mean Accuracy": -1,
-                   "Frequency Weighted IoU": -1,
-                   "Mean IoU": -1
-               })
 
     # Dataset
     dataset = get_dataset(CONFIG.DATASET.NAME)(
