@@ -1,5 +1,5 @@
 EXP:
-    ID: m4_d3_from_e1k
+    ID: m4_d3_e1850_test
     OUTPUT_DIR: /home/qx2217/PaintingSynthesis/deeplab-pytorch-master/outputs/
 
 DATASET:
@@ -31,7 +31,7 @@ MODEL:
     NAME: DeepLabV2_ResNet101_MSC
     N_BLOCKS: [3, 4, 23, 3]
     ATROUS_RATES: [6, 12, 18, 24]
-    INIT_MODEL: /home/qx2217/PaintingSynthesis/deeplab-pytorch-master/outputs/models/m1_d3/deeplabv2_resnet101_msc/4-27-17-31/train2017/checkpoint_final.pth
+    INIT_MODEL: /home/qx2217/PaintingSynthesis/deeplab-pytorch-master/outputs/models/m4_d3_from_e1k/deeplabv2_resnet101_msc/4-27-22-56/train2017/checkpoint_1850.pth
 
 SOLVER:
     BATCH_SIZE:
