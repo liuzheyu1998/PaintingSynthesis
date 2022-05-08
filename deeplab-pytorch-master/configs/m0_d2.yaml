@@ -1,10 +1,10 @@
 EXP:
-    ID: m2_d3
+    ID: m0_d2
     OUTPUT_DIR: /home/qx2217/PaintingSynthesis/deeplab-pytorch-master/outputs/
 
 DATASET:
     NAME: cocostuff164k
-    ROOT: /home/qx2217/data/adain/
+    ROOT: /home/qx2217/data/coco_style/
     LABELS: /home/qx2217/data/datasets/cocostuff/labels.txt
     N_CLASSES: 182
     IGNORE_LABEL: 255
@@ -31,7 +31,7 @@ MODEL:
     NAME: DeepLabV2_ResNet101_MSC
     N_BLOCKS: [3, 4, 23, 3]
     ATROUS_RATES: [6, 12, 18, 24]
-    INIT_MODEL: /home/qx2217/PaintingSynthesis/deeplab-pytorch-master/outputs/models/m2_d2_train/deeplabv2_resnet101_msc/4-20-21-43/train2017/checkpoint_800.pth
+    INIT_MODEL:
 
 SOLVER:
     BATCH_SIZE:
