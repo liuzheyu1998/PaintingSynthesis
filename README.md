@@ -1,2 +1,3 @@
 # PaintingSynthesis
-Final project for Advanced topics in deep learning.
+
+The detailed findings could be found in the Semantic_Segmentation_and_Synthesis_for_Painting.pdf.
