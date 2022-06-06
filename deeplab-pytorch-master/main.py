@@ -26,6 +26,8 @@ from tqdm import tqdm
 from libs.datasets import get_dataset
 from libs.models import DeepLabV2_ResNet101_MSC
 from libs.utils import DenseCRF, PolynomialLR, scores
+import wandb
+from datetime import datetime
 
 
 def makedirs(dirs):
@@ -113,6 +115,17 @@ def train(config_path, cuda):
     device = get_device(cuda)
     torch.backends.cudnn.benchmark = True
 
+    # wandb
+    wandb.init(project="painting-synthesis",
+               entity="qx2217",
+               name=CONFIG.EXP.ID + '_train',
+               config={
+                   "Pixel Accuracy": -1,
+                   "Mean Accuracy": -1,
+                   "Frequency Weighted IoU": -1,
+                   "Mean IoU": -1
+               })
+
     # Dataset
     dataset = get_dataset(CONFIG.DATASET.NAME)(
         root=CONFIG.DATASET.ROOT,
@@ -144,12 +157,22 @@ def train(config_path, cuda):
 
     # Model setup
     model = DeepLabV2_ResNet101_MSC(n_classes=CONFIG.DATASET.N_CLASSES)
-    state_dict = torch.load(CONFIG.MODEL.INIT_MODEL)
-    print("    Init:", CONFIG.MODEL.INIT_MODEL)
-    for m in model.base.state_dict().keys():
-        if m not in state_dict.keys():
-            print("    Skip init:", m)
-    model.base.load_state_dict(state_dict, strict=False)  # to skip ASPP
+    if CONFIG.MODEL.INIT_MODEL:
+        state_dict = torch.load(CONFIG.MODEL.INIT_MODEL)
+        print("    Init:", CONFIG.MODEL.INIT_MODEL)
+
+        # for m in model.base.state_dict().keys():
+        #     if m not in state_dict.keys():
+        #         print("    Skip init:", m)
+        # TODO
+        for m in model.state_dict().keys():
+            if m not in state_dict.keys():
+                print("    model Skip init:", m)
+        # model.base.load_state_dict(state_dict, strict=False)  # to skip ASPP
+        model.load_state_dict(state_dict)  # TODO
+    else:
+        print("    Warning: no weights loaded!")
+
     model = nn.DataParallel(model)
     model.to(device)
 
@@ -193,11 +216,14 @@ def train(config_path, cuda):
     average_loss = MovingAverageValueMeter(CONFIG.SOLVER.AVERAGE_LOSS)
 
     # Path to save models
+    time_info = datetime.now()
+    timestamp = f"{time_info.month}-{time_info.day}-{time_info.hour}-{time_info.minute}"
     checkpoint_dir = os.path.join(
         CONFIG.EXP.OUTPUT_DIR,
         "models",
         CONFIG.EXP.ID,
         CONFIG.MODEL.NAME.lower(),
+        timestamp,
         CONFIG.DATASET.SPLIT.TRAIN,
     )
     makedirs(checkpoint_dir)
@@ -212,7 +238,6 @@ def train(config_path, cuda):
         total=CONFIG.SOLVER.ITER_MAX,
         dynamic_ncols=True,
     ):
-
         # Clear gradients (ready to accumulate)
         optimizer.zero_grad()
 
@@ -251,6 +276,10 @@ def train(config_path, cuda):
 
         # TensorBoard
         if iteration % CONFIG.SOLVER.ITER_TB == 0:
+            wandb.log({
+                "epoch": iteration,
+                "train loss": average_loss.value()[0]
+            })
             writer.add_scalar("loss/train", average_loss.value()[0], iteration)
             for i, o in enumerate(optimizer.param_groups):
                 writer.add_scalar("lr/group_{}".format(i), o["lr"], iteration)
@@ -310,6 +339,17 @@ def test(config_path, model_path, cuda):
     CONFIG = OmegaConf.load(config_path)
     device = get_device(cuda)
     torch.set_grad_enabled(False)
+
+    # wandb
+    wandb.init(project="painting-synthesis",
+               entity="qx2217",
+               name=CONFIG.EXP.ID + '_test',
+               config={
+                   "Pixel Accuracy": -1,
+                   "Mean Accuracy": -1,
+                   "Frequency Weighted IoU": -1,
+                   "Mean IoU": -1
+               })
 
     # Dataset
     dataset = get_dataset(CONFIG.DATASET.NAME)(
@@ -389,6 +429,12 @@ def test(config_path, model_path, cuda):
 
     # Pixel Accuracy, Mean Accuracy, Class IoU, Mean IoU, Freq Weighted IoU
     score = scores(gts, preds, n_class=CONFIG.DATASET.N_CLASSES)
+    wandb.config.update({
+               "Pixel Accuracy": score["Pixel Accuracy"],
+               "Mean Accuracy": score["Mean Accuracy"],
+               "Frequency Weighted IoU": score["Frequency Weighted IoU"],
+               "Mean IoU": score["Mean IoU"]
+           }, allow_val_change=True)
 
     with open(save_path, "w") as f:
         json.dump(score, f, indent=4, sort_keys=True)
